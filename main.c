@@ -11,7 +11,7 @@ int ***cria_tab(int n);
 int altura(int ***tab, int n, int x, int y);
 
 int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
-int pontos_linha(int qtd_a, int qtd_b);
+int pontos_linha(int n, int qtd_a, int qtd_b);
 int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
 
 int main() {
@@ -52,7 +52,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo y */
   qtd_cor_a = 0;
@@ -70,7 +70,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo z */
   qtd_cor_a = 0;
@@ -88,7 +88,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* BUSCA PELAS LINHAS CLASSE 2 */
   /* busca pela linha do plano com os pontos A, B, G, e H */
@@ -108,7 +108,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos C, D, E, e F */
@@ -128,7 +128,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos A, D, F, e G */
@@ -148,7 +148,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos B, C, E, e H */
@@ -168,7 +168,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* BUSCA PELAS LINHAS CLASSE 3 */
@@ -189,18 +189,22 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha(qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   return pontos;
 }
 
-int pontos_linha(int qtd_a, int qtd_b){
+int pontos_linha(int n, int qtd_a, int qtd_b){
   if(qtd_a >= 1 && qtd_b == 0){
     /* caso de linha apenas da cor desejada */
+    if(qtd_a == n - 1)
+      return 50;
     return 1;
   } else if(qtd_a == 0 && qtd_b >= 1){
     /* caso de linha apenas da cor do inimigo */
+    if(qtd_b == n - 1)
+      return 50;
     return 20;
   } else if(qtd_a == 0 && qtd_b == 0){
     /* caso de linha vazia */
