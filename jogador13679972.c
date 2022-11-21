@@ -28,106 +28,20 @@ melhor técnica para o jogo da velha n x n. Eu conjecturo que esta seja a melhor
 Referência: Positional Games by Hefetz, Krivelevich, Stojaković and Szabó */
 
 /*  */
-
-void print_tab(int ***tab, int n);
-void print_cam(int ***tab, int n, int camada);
-void insere(int ***tab, int n, int cor, int x, int y);
 int disponivel13679972(int ***tab, int n, int x, int y);
-int ***cria_tab(int n);
 int altura13679972(int ***tab, int n, int x, int y);
-
-void receber_jogadas(int ***tab, int n, int cor);
-int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
-int fim_de_jogo(int ***tab, int n);
+int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col);
 int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z);
 int pontos_linha13679972(int n, int qtd_a, int qtd_b);
 
-int main() {
-  int n;
-  int ***tab;
-
-  printf("Bem-vindo ao jogo da velha 3D n x n x n com gravidade!\n");
-  printf("Escolha o tamanho do tabuleiro:\n");
-  scanf(" %d", &n);
-  tab = cria_tab(n);
-  printf("Tabuleiro criado!\n");
-
-  receber_jogadas(tab, n, 1);
-  return 0;
-}
-
-/* recebe entradas dos jogadores */
-void receber_jogadas(int ***tab, int n, int cor) {
-  int x, y, z;
-  char acao;
-  int vencedor = 0;
-  int contador = 0;
-  int max = n*n*n;
-
-  printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
-  scanf(" %c", &acao);
-
-  if(acao == 'a'){
-    print_tab(tab, n);
-    printf("Para jogar, digite dois inteiro x e y\n");
-    scanf(" %d %d", &x, &y);
-    z = altura13679972(tab, n, x, y);
-    insere(tab, n, cor, x, y);
-  }
-  print_tab(tab, n);
-  while (contador <= max) {
-    /* jogada da máquina */
-    escolheJogada(tab, n, -cor, &x, &y);
-    insere(tab, n, -cor, x, y);
-    print_tab(tab, n);
-    contador++;
-
-    /* verificação de vencedor */
-    vencedor = fim_de_jogo(tab, n);
-    if(vencedor == 1){
-      printf("Voce ganhou!");
-      break;
-    } else if(vencedor == -1){
-      printf("Voce perdeu.");
-      break;
-    }
-    
-    /* jogada humana */
-    scanf(" %d %d", &x, &y);
-    if (!disponivel13679972(tab, n, x, y))
-      printf("Posição não disponível\n");
-    else{
-      z = altura13679972(tab, n, x, y);
-      insere(tab, n, cor, x, y);
-      print_tab(tab, n);
-      contador++;
-    }
-
-    /* verificação de vencedor */
-    vencedor = fim_de_jogo(tab, n);
-    if(vencedor == 1){
-      printf("Voce ganhou!");
-      break;
-    } else if(vencedor == -1){
-      printf("Voce perdeu.");
-      break;
-    }
-  if(contador == max && vencedor == 0){
-    printf("Empate.\n");
-  }
-  }
-}
-
 /* devolve uma jogada feita pela máquina */
-int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
+int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col){
   int i, j, k;
   int maior_pont = 0;
   int atual_pont = 0;
   int x_otimo = 0;
   int y_otimo = 0;
 
-  printf("Maquina pensando na jogada...\n");
-  printf("Mapa tático:\n");
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
       k = altura13679972(tab, n, i, j);
@@ -137,9 +51,7 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
         x_otimo = i;
         y_otimo = j;
       }
-      printf("%d ", atual_pont);
     }
-    printf("\n");
   }
 
   *lin = x_otimo;
@@ -148,219 +60,6 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   /* caso não exista nenhuma posição disponível */
   if(maior_pont == -1){
     return -1;
-  }
-
-  return 0;
-}
-
-/* diz se o jogo está ou não finalizado e retorna o índice do jogador campeão */
-int fim_de_jogo(int ***tab, int n){
-  int qtd_cor_a;
-  int qtd_cor_b;
-  int i, j, k;
-
-  return 0;
-  /* BUSCA PELAS LINHAS CLASSE 1 */
-
-  /* busca pela linha em paralela ao eixo x */
-  for(i = 0; i < n; i++){
-    for(j = 0; j < n; j++){
-      qtd_cor_a = 0;
-      qtd_cor_b = 0;
-      for(k = 0; k < n; k++){
-        if(tab[k][i][j] == 1){
-          qtd_cor_a++;
-        } else if(tab[k][j][i] == -1){
-          qtd_cor_b++;
-        }
-        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-          break;
-        }
-      }
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha em paralela ao eixo y */
-  for(i = 0; i < n; i++){
-    for(j = 0; j < n; j++){
-      qtd_cor_a = 0;
-      qtd_cor_b = 0;
-      for(k = 0; k < n; k++){
-        if(tab[i][k][j] == 1){
-          qtd_cor_a++;
-        } else if(tab[i][k][i] == -1){
-          qtd_cor_b++;
-        }
-        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-          break;
-        }
-      }
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-  
-  /* busca pela linha em paralela ao eixo z */
-  for(i = 0; i < n; i++){
-    for(j = 0; j < n; j++){
-      qtd_cor_a = 0;
-      qtd_cor_b = 0;
-      for(k = 0; k < n; k++){
-        if(tab[i][j][k] == 1){
-          qtd_cor_a++;
-        } else if(tab[i][j][k] == -1){
-          qtd_cor_b++;
-        }
-        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-          break;
-        }
-      }
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos A, B, G, e H */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[i][n-j-1][j] == 1){
-        qtd_cor_a++;
-      } else if(tab[i][n-j-1][j] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos C, D, E e F */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[i][j][j] == 1){
-        qtd_cor_a++;
-      } else if(tab[i][j][j] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos A, D, F e G */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[j][i][j] == 1){
-        qtd_cor_a++;
-      } else if(tab[j][i][j] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos B, C, E e H */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[n-j-1][i][j] == 1){
-        qtd_cor_a++;
-      } else if(tab[n-j-1][i][j] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos A, C, G e E */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[n-j-1][j][i] == 1){
-        qtd_cor_a++;
-      } else if(tab[n-j-1][j][i] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
-  }
-
-  /* busca pela linha do plano com os pontos B, D, F e H */
-  for(i = 0; i < n; i++){
-    qtd_cor_a = 0;
-    qtd_cor_b = 0;
-    for(j = 0; j < n; j++){
-      if(tab[j][j][i] == 1){
-        qtd_cor_a++;
-      } else if(tab[j][j][i] == -1){
-        qtd_cor_b++;
-      }
-      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
-        break;
-      }
-
-      if(qtd_cor_a == n){
-        return 1;
-      } else if(qtd_cor_b == n){
-        return -1;
-      }
-    }
   }
 
   return 0;
@@ -652,70 +351,12 @@ int pontos_linha13679972(int n, int qtd_a, int qtd_b){
   return 0;
 }
 
-/* imprime todo o tabuleiro em camadas, por ordem crescente */
-void print_tab(int ***tab, int n) {
-  int i;
-  /* impressão camada a camada */
-  for (i = n - 1; i >= 0; i--) {
-    print_cam(tab, n, i);
-    printf("\n");
-  }
-}
-
-/* imprime uma única camada do tabuleiro */
-void print_cam(int ***tab, int n, int camada) {
-  int i, j;
-
-  printf("Camada %d:\n", camada);
-  for (i = 0; i < n; i++) {
-    /* impressão linha a linha */
-    for (j = 0; j < n; j++) {
-      /* impressão de cada elemento de cada coluna */
-      printf("%d ", tab[i][j][camada]);
-    }
-    printf("\n");
-  }
-}
-
-/* insere uma bolinha de uma certa cor n posição (x,y) */
-void insere(int ***tab, int n, int cor, int x, int y) {
-  int i;
-  /* procurando primeira posição vazia, de baixo para cima */
-  i = 0;
-  while (tab[x][y][i] != 0)
-    i++;
-
-  tab[x][y][i] = cor;
-}
-
 /* verifica se a posição (x,y) não está cheia*/
 int disponivel13679972(int ***tab, int n, int x, int y) {
   /* verifica se a posição (x,y) da última camada está vazia */
   if (tab[x][y][n - 1] != 0)
     return 0;
   return 1;
-}
-
-/* retorna um ponteiro 3D correspondente ao tabuleiro */
-int ***cria_tab(int n) {
-  int i, j, k;
-  int ***tab;
-
-  /* alocação dinâmica de memória para o tabuleiro */
-  tab = malloc(n * sizeof(int **));
-  for (i = 0; i < n; i++) {
-    tab[i] = malloc(n * sizeof(int *));
-    for (j = 0; j < n; j++)
-      tab[i][j] = malloc(n * sizeof(int));
-  }
-
-  /* zera todas as entradas por padrão */
-  for (i = 0; i < n; i++)
-    for (j = 0; j < n; j++)
-      for (k = 0; k < n; k++)
-        tab[i][j][k] = 0;
-
-  return tab;
 }
 
 /* retorna a altura da pilha na posição (x,y) */
