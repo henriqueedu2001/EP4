@@ -205,7 +205,8 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
     }
     printf("\n");
   }
-
+  printf("\n");
+  
   *lin = x_otimo;
   *col = y_otimo;
 
