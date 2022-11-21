@@ -28,7 +28,7 @@ melhor técnica para o jogo da velha n x n. Eu conjecturo que esta seja a melhor
 Referência: Positional Games by Hefetz, Krivelevich, Stojaković and Szabó */
 
 /*  */
-int disponivel13679972(int ***tab, int n, int x, int y);
+int disponivel(int ***tab, int n, int x, int y);
 int altura13679972(int ***tab, int n, int x, int y);
 int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col);
 int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z);
@@ -352,7 +352,7 @@ int pontos_linha13679972(int n, int qtd_a, int qtd_b){
 }
 
 /* verifica se a posição (x,y) não está cheia*/
-int disponivel13679972(int ***tab, int n, int x, int y) {
+int disponivel(int ***tab, int n, int x, int y) {
   /* verifica se a posição (x,y) da última camada está vazia */
   if (tab[x][y][n - 1] != 0)
     return 0;

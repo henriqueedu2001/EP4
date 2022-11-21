@@ -45,27 +45,74 @@ classe 3) — estou denominando de classes para separá-las em categorias.
 void print_tab(int ***tab, int n);
 void print_cam(int ***tab, int n, int camada);
 void insere(int ***tab, int n, int cor, int x, int y);
-int disponivel13679972(int ***tab, int n, int x, int y);
+int disponivel(int ***tab, int n, int x, int y);
 int ***cria_tab(int n);
-int altura13679972(int ***tab, int n, int x, int y);
+int altura(int ***tab, int n, int x, int y);
 void receber_jogadas(int ***tab, int n, int cor);
+void ia_vs_ia(int ***tab, int n);
 int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
 int fim_de_jogo(int ***tab, int n);
-int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z);
-int pontos_linha13679972(int n, int qtd_a, int qtd_b);
+int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
+int pontos_linha(int n, int qtd_a, int qtd_b);
 
 int main() {
   int n;
   int ***tab;
+  char acao;
 
   printf("Bem-vindo ao jogo da velha 3D n x n x n com gravidade!\n");
   printf("Escolha o tamanho do tabuleiro:\n");
   scanf(" %d", &n);
   tab = cria_tab(n);
   printf("Tabuleiro criado!\n");
-
-  receber_jogadas(tab, n, 1);
+  printf("Quer jogar em qual modo?\n[a] Player vs Máquina/n[b] Máquina vs Máquina hahahaa\n");
+  scanf(" %c", &acao);
+  if(acao == 'a'){
+    receber_jogadas(tab, n, 1);
+  } else {
+    ia_vs_ia(tab, n);
+  }
   return 0;
+}
+
+/* coloca duas máquina para jogar uma contra a outra kkkkkkkkkkkk */
+/* spotniks: colocamos duas ias para jogar, sem que elas soubessem kkkkkk */
+void ia_vs_ia(int ***tab, int n){
+  int contador = 0;
+  int vencedor = 0;
+  int cor = 1;
+  int x, y, z;
+  int max;
+  char acao;
+
+  max = n*n*n;
+
+  print_tab(tab, n);
+  printf("pressione qualquer tecla para ver próxima jogada\n");
+  while (contador < max) {
+    scanf(" %c", &acao);
+    if(cor == 1){
+      printf("Vez da Máquina A\n");
+    } else {
+      printf("Vez da Máquina B\n");
+    }
+    escolheJogada(tab, n, -cor, &x, &y);
+    insere(tab, n, -cor, x, y);
+    print_tab(tab, n);
+    contador++;
+    cor = -cor;
+
+    vencedor = fim_de_jogo(tab, n);
+    if(vencedor == 1){
+      printf("A ganhou! (ela ganha sempre kkkkkkkkkk)\n");
+      break;
+    } else if(vencedor == -1){
+      printf("B ganhou!\n");
+      break;
+    }
+
+  }
+  
 }
 
 /* recebe entradas dos jogadores */
@@ -86,7 +133,7 @@ void receber_jogadas(int ***tab, int n, int cor) {
     print_tab(tab, n);
     printf("Para jogar, digite dois inteiro x e y\n");
     scanf(" %d %d", &x, &y);
-    z = altura13679972(tab, n, x, y);
+    z = altura(tab, n, x, y);
     insere(tab, n, cor, x, y);
   }
   print_tab(tab, n);
@@ -100,19 +147,19 @@ void receber_jogadas(int ***tab, int n, int cor) {
     /* verificação de vencedor */
     vencedor = fim_de_jogo(tab, n);
     if(vencedor == 1){
-      printf("Voce ganhou!");
+      printf("Voce ganhou!\n");
       break;
     } else if(vencedor == -1){
-      printf("Voce perdeu.");
+      printf("Voce perdeu.\n");
       break;
     }
     
     /* jogada humana */
     scanf(" %d %d", &x, &y);
-    if (!disponivel13679972(tab, n, x, y))
+    if (!disponivel(tab, n, x, y))
       printf("Posição não disponível\n");
     else{
-      z = altura13679972(tab, n, x, y);
+      z = altura(tab, n, x, y);
       insere(tab, n, cor, x, y);
       print_tab(tab, n);
       contador++;
@@ -145,8 +192,8 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   printf("Mapa tático:\n");
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
-      k = altura13679972(tab, n, i, j);
-      atual_pont = pontuacao13679972(tab, n, cor, i, j, k);
+      k = altura(tab, n, i, j);
+      atual_pont = pontuacao(tab, n, cor, i, j, k);
       if(atual_pont > maior_pont){
         maior_pont = atual_pont;
         x_otimo = i;
@@ -381,7 +428,7 @@ int fim_de_jogo(int ***tab, int n){
 }
 
 /* para uma posição (x,y,z), retorna a pontuação correspondente */
-int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
+int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   int pontos = 0;
   int i, j, k;
   int qtd_cor_a = 0;
@@ -411,7 +458,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo y */
   qtd_cor_a = 0;
@@ -429,7 +476,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo z */
   qtd_cor_a = 0;
@@ -447,7 +494,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* BUSCA PELAS LINHAS CLASSE 2 */
   /* busca pela linha do plano com os pontos A, B, G, e H */
@@ -467,7 +514,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos C, D, E, e F */
@@ -487,7 +534,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos A, D, F, e G */
@@ -507,7 +554,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos B, C, E, e H */
@@ -527,7 +574,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos A, C, G, e E */
@@ -547,7 +594,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos B, D, F, e H */
@@ -567,7 +614,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* BUSCA PELAS LINHAS CLASSE 3 */
@@ -588,7 +635,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha diagonal BH */
   qtd_cor_a = 0;
@@ -607,7 +654,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha diagonal CE */
   qtd_cor_a = 0;
@@ -626,7 +673,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
     
   /* busca pela linha diagonal DF */
   qtd_cor_a = 0;
@@ -645,13 +692,13 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   return pontos;
 }
 
 /* retorna a pontuação correspondente de uma certa linha */
-int pontos_linha13679972(int n, int qtd_a, int qtd_b){
+int pontos_linha(int n, int qtd_a, int qtd_b){
   if(qtd_a >= 1 && qtd_b == 0){
     /* caso de linha apenas da cor desejada */
     if(qtd_a == n - 1)
@@ -713,7 +760,7 @@ void insere(int ***tab, int n, int cor, int x, int y) {
 }
 
 /* verifica se a posição (x,y) não está cheia*/
-int disponivel13679972(int ***tab, int n, int x, int y) {
+int disponivel(int ***tab, int n, int x, int y) {
   /* verifica se a posição (x,y) da última camada está vazia */
   if (tab[x][y][n - 1] != 0)
     return 0;
@@ -743,7 +790,7 @@ int ***cria_tab(int n) {
 }
 
 /* retorna a altura da pilha na posição (x,y) */
-int altura13679972(int ***tab, int n, int x, int y){
+int altura(int ***tab, int n, int x, int y){
   int h = 0;
   if(tab[x][y][n-1] != 0){
     return n;
