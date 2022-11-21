@@ -16,8 +16,6 @@ int fim_de_jogo(int ***tab, int n);
 int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
 int pontos_linha(int n, int qtd_a, int qtd_b);
 
-
-
 int main() {
   int n;
   int ***tab;
@@ -192,6 +190,28 @@ int fim_de_jogo(int ***tab, int n){
     }
   }
 
+  /* busca pela linha do plano com os pontos A, B, G, e H */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[i][n-j-1][j] == 1){
+        qtd_cor_a++;
+      } else if(tab[i][n-j-1][j] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
   return 0;
 }
 
@@ -202,7 +222,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   int qtd_cor_a = 0;
   int qtd_cor_b = 0;
 
-  if(z == n - 1){
+  if(z == n){
     return -1;
   }
 
@@ -345,12 +365,12 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   /* busca pela linha do plano com os pontos A, C, G, e E */
   qtd_cor_a = 0;
   qtd_cor_b = 0;
-  if(x){
+  if(x + y == n - 1){
     for(i = 0; i < n; i++){
       /* contagem de cores */
-      if(tab[n-i-1][y][i] == cor)
+      if(tab[n-i-1][i][z] == cor)
         qtd_cor_a++;
-      else if(tab[n-i-1][y][i] == -cor)
+      else if(tab[n-i-1][i][z] == -cor)
         qtd_cor_b++;
 
       /* caso de linha obstruída */
@@ -361,6 +381,103 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
     /* soma dos pontos */
     pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
+
+  /* busca pela linha do plano com os pontos B, D, F, e H */
+  qtd_cor_a = 0;
+  qtd_cor_b = 0;
+  if(x == y){
+    for(i = 0; i < n; i++){
+      /* contagem de cores */
+      if(tab[i][i][z] == cor)
+        qtd_cor_a++;
+      else if(tab[i][i][z] == -cor)
+        qtd_cor_b++;
+
+      /* caso de linha obstruída */
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+    }
+    /* soma dos pontos */
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
+  }
+
+  /* BUSCA PELAS LINHAS CLASSE 3 */
+  /* busca pela linha diagonal AG */
+  qtd_cor_a = 0;
+  qtd_cor_b = 0;
+  if(x + y == n - 1 && y + z == n - 1){
+    for(i = 0; i < 0; i++){
+      /* contagem de cores */
+      if(tab[i][n-i-1][i] == cor)
+        qtd_cor_a++;
+      else if(tab[i][n-i-1][i] == -cor)
+        qtd_cor_b++;
+
+      /* caso de linha obstruída */
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1)
+        break;
+    }
+  }
+  /* soma dos pontos */
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
+
+  /* busca pela linha diagonal BH */
+  qtd_cor_a = 0;
+  qtd_cor_b = 0;
+  if(x == y && x + z == n - 1){
+    for(i = 0; i < 0; i++){
+      /* contagem de cores */
+      if(tab[n-i-1][n-i-1][i] == cor)
+        qtd_cor_a++;
+      else if(tab[n-i-1][n-i-1][i] == -cor)
+        qtd_cor_b++;
+
+      /* caso de linha obstruída */
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1)
+        break;
+    }
+  }
+  /* soma dos pontos */
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
+
+  /* busca pela linha diagonal CE */
+  qtd_cor_a = 0;
+  qtd_cor_b = 0;
+  if(x + y == n - 1 && x + z == n - 1){
+    for(i = 0; i < 0; i++){
+      /* contagem de cores */
+      if(tab[n-i-1][i][i] == cor)
+        qtd_cor_a++;
+      else if(tab[n-i-1][i][i] == -cor)
+        qtd_cor_b++;
+
+      /* caso de linha obstruída */
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1)
+        break;
+    }
+  }
+  /* soma dos pontos */
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
+    
+  /* busca pela linha diagonal DF */
+  qtd_cor_a = 0;
+  qtd_cor_b = 0;
+  if(x == y && x == z){
+    for(i = 0; i < 0; i++){
+      /* contagem de cores */
+      if(tab[i][i][i] == cor)
+        qtd_cor_a++;
+      else if(tab[i][i][i] == -cor)
+        qtd_cor_b++;
+
+      /* caso de linha obstruída */
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1)
+        break;
+    }
+  }
+  /* soma dos pontos */
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   return pontos;
 }
