@@ -65,7 +65,7 @@ int main() {
   scanf(" %d", &n);
   tab = cria_tab(n);
   printf("Tabuleiro criado!\n");
-  printf("Quer jogar em qual modo?\n[a] Player vs Máquina/n[b] Máquina vs Máquina hahahaa\n");
+  printf("Quer jogar em qual modo?\n[a] Player vs Maquina\n[b] Maquina vs Maquina kkkkkkk\n");
   scanf(" %c", &acao);
   if(acao == 'a'){
     receber_jogadas(tab, n, 1);
@@ -81,14 +81,14 @@ void ia_vs_ia(int ***tab, int n){
   int contador = 0;
   int vencedor = 0;
   int cor = 1;
-  int x, y, z;
+  int x, y;
   int max;
   char acao;
 
   max = n*n*n;
 
   print_tab(tab, n);
-  printf("pressione qualquer tecla para ver próxima jogada\n");
+  printf("pressione qualquer tecla para ver proxima jogada\n");
   while (contador < max) {
     scanf(" %c", &acao);
     if(cor == 1){
@@ -104,13 +104,12 @@ void ia_vs_ia(int ***tab, int n){
 
     vencedor = fim_de_jogo(tab, n);
     if(vencedor == 1){
-      printf("A ganhou! (ela ganha sempre kkkkkkkkkk)\n");
+      printf("Maquina A ganhou! (ela ganha sempre kkkkkkkkkk)\n");
       break;
     } else if(vencedor == -1){
-      printf("B ganhou!\n");
+      printf("Maquina B ganhou!\n");
       break;
     }
-
   }
   
 }
@@ -126,6 +125,7 @@ void receber_jogadas(int ***tab, int n, int cor) {
   x = y = z = 0;
   max = n*n*n;
 
+  print_tab(tab, n);
   printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
   scanf(" %c", &acao);
 
@@ -135,8 +135,10 @@ void receber_jogadas(int ***tab, int n, int cor) {
     scanf(" %d %d", &x, &y);
     z = altura(tab, n, x, y);
     insere(tab, n, cor, x, y);
+  } else {
+    printf("Se tu ganhar da maquina, 100 kwanzas no pix\nMande email para henrique_eduardo_souza@usp.br\n");
   }
-  print_tab(tab, n);
+  
   while (contador <= max) {
     /* jogada da máquina */
     escolheJogada(tab, n, -cor, &x, &y);
@@ -189,7 +191,7 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   int y_otimo = 0;
 
   printf("Maquina pensando na jogada...\n");
-  printf("Mapa tático:\n");
+  printf("Mapa tatico:\n");
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
       k = altura(tab, n, i, j);

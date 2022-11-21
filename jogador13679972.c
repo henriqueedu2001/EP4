@@ -16,42 +16,61 @@ melhor técnica para o jogo da velha n x n. Eu conjecturo que esta seja a melhor
     (ii) a pontuação é calculada a partir da quantidade de linhas retas que aquela jogada é
     capaz de bloquear ou preencher.
     (iii) escolher a posição com a maior pontuação.
-  A pontuação segue aos seguintes critérios: para cada linha que será obstruída, ou seja,
-  inutilizada para o adversário, acrescentar uma unidade à pontuação. Para cada linha pres-
-  -tes a ser preenchida pelo adversário, contar uma quantidade de pontos tal que essa quan-
-  -tia seja maior que a maior quantidade de linhas potencialemente obstruídas por uma única
-  casa, pois é mais importante impedir uma vitória que ocupar uma posição numa fila vazia. 
-  Neste caso, a pontuação escolhida foi 50, apenas por segurança, mas poderia ser menor. Se
-  há uma fila quase preenchida favoravelmente, a mesma ideia se aplica, para que a máquina
-  priorize vencer ao invés de marcar uma outra posição. Por fim, a pontuação não soma nada
-  se uma fila já estiver obstruída, pois posicioná-la neste lugar não traz benefício algum.
+  A pontuação segue aos seguintes critérios: para cada linha que será obstruída, ou seja, 
+inutilizada para o adversário, acrescentar uma unidade à pontuação. Para cada linha prestes
+a ser preenchida pelo adversário, contar uma quantidade de pontos tal que essa quantia seja 
+maior que a maior quantidade de linhas potencialemente obstruídas por uma única casa, pois é
+mais importante impedir uma vitória que ocupar uma posição numa fila vazia. Neste caso, a 
+pontuação escolhida foi 50, apenas por segurança, mas poderia ser menor. Se há uma fila qua-
+-se preenchida favoravelmente, a mesma ideia se aplica, para que a máquina priorize vencer 
+ao invés de marcar uma outra posição. Por fim, a pontuação não soma nada se uma fila já es-
+tiver obstruída, pois posicioná-la neste lugar não traz benefício algum.
+  Essa estratégia torna a implementação do EP pobre em questão de estrutura de dados e algo-
+-ritmos, pois sua realização é tão simples, do ponto de vista conceitual, que não necessita
+de estruturas como árvores, listas ligadas, pilhas etc. Se o objetivo maior não fosse produ-
+zir a função mais eficaz, mas abordar os temas tratados no curso, faria diferente; no entan-
+-to, meu desejo é mais ganhar o campeonato que brincar com árvores.
 Referência: Positional Games by Hefetz, Krivelevich, Stojaković and Szabó */
 
-/*  */
+/* CÓDIGO */
+/* O coração do código é a função que escolhe jogadas; sua implementação é bem direta: para
+uma certa posição (x,y,z), ela investiga o padrão de cada linha reta que passa por ela, como
+as retas paralelas a Ox, Oy e Oz (retas classe 1), as paralelas a planos definidos por ares-
+-tas do cubo (retas classe 2) e, finalmente, as diagonais de vértices opostos do cubo (retas
+classe 3) — estou denominando de classes para separá-las em categorias.
+ */
+
+/* PROTÓTIPO DAS FUNÇÕES */
+
+void insere(int ***tab, int n, int cor, int x, int y);
 int disponivel(int ***tab, int n, int x, int y);
-int altura13679972(int ***tab, int n, int x, int y);
-int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col);
-int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z);
-int pontos_linha13679972(int n, int qtd_a, int qtd_b);
+int altura(int ***tab, int n, int x, int y);
+int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
+int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
+int pontos_linha(int n, int qtd_a, int qtd_b);
 
 /* devolve uma jogada feita pela máquina */
-int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col){
+int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   int i, j, k;
   int maior_pont = 0;
   int atual_pont = 0;
   int x_otimo = 0;
   int y_otimo = 0;
 
+  printf("Maquina pensando na jogada...\n");
+  printf("Mapa tatico:\n");
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
-      k = altura13679972(tab, n, i, j);
-      atual_pont = pontuacao13679972(tab, n, cor, i, j, k);
+      k = altura(tab, n, i, j);
+      atual_pont = pontuacao(tab, n, cor, i, j, k);
       if(atual_pont > maior_pont){
         maior_pont = atual_pont;
         x_otimo = i;
         y_otimo = j;
       }
+      printf("%d ", atual_pont);
     }
+    printf("\n");
   }
 
   *lin = x_otimo;
@@ -66,11 +85,14 @@ int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col){
 }
 
 /* para uma posição (x,y,z), retorna a pontuação correspondente */
-int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
+int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   int pontos = 0;
   int i, j, k;
   int qtd_cor_a = 0;
   int qtd_cor_b = 0;
+
+  qtd_cor_a = qtd_cor_b = 0;
+  i = j = k = 0;
 
   if(z == n){
     return -1;
@@ -93,7 +115,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo y */
   qtd_cor_a = 0;
@@ -111,7 +133,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha em paralela ao eixo z */
   qtd_cor_a = 0;
@@ -129,7 +151,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-  pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+  pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* BUSCA PELAS LINHAS CLASSE 2 */
   /* busca pela linha do plano com os pontos A, B, G, e H */
@@ -149,7 +171,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos C, D, E, e F */
@@ -169,7 +191,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos A, D, F, e G */
@@ -189,7 +211,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos B, C, E, e H */
@@ -209,7 +231,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos A, C, G, e E */
@@ -229,7 +251,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* busca pela linha do plano com os pontos B, D, F, e H */
@@ -249,7 +271,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
       }
     }
     /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
   /* BUSCA PELAS LINHAS CLASSE 3 */
@@ -270,7 +292,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha diagonal BH */
   qtd_cor_a = 0;
@@ -289,7 +311,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   /* busca pela linha diagonal CE */
   qtd_cor_a = 0;
@@ -308,7 +330,7 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
     
   /* busca pela linha diagonal DF */
   qtd_cor_a = 0;
@@ -327,13 +349,13 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
     }
   }
   /* soma dos pontos */
-    pontos += pontos_linha13679972(n, qtd_cor_a, qtd_cor_b);
+    pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
 
   return pontos;
 }
 
 /* retorna a pontuação correspondente de uma certa linha */
-int pontos_linha13679972(int n, int qtd_a, int qtd_b){
+int pontos_linha(int n, int qtd_a, int qtd_b){
   if(qtd_a >= 1 && qtd_b == 0){
     /* caso de linha apenas da cor desejada */
     if(qtd_a == n - 1)
@@ -360,7 +382,7 @@ int disponivel(int ***tab, int n, int x, int y) {
 }
 
 /* retorna a altura da pilha na posição (x,y) */
-int altura13679972(int ***tab, int n, int x, int y){
+int altura(int ***tab, int n, int x, int y){
   int h = 0;
   if(tab[x][y][n-1] != 0){
     return n;
