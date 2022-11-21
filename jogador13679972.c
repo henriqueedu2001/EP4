@@ -38,6 +38,10 @@ uma certa posição (x,y,z), ela investiga o padrão de cada linha reta que pass
 as retas paralelas a Ox, Oy e Oz (retas classe 1), as paralelas a planos definidos por ares-
 -tas do cubo (retas classe 2) e, finalmente, as diagonais de vértices opostos do cubo (retas
 classe 3) — estou denominando de classes para separá-las em categorias.
+A verificação usa um processo iterativo simples, que é feito com laços for encadeados; infe-
+-lizmente, eles ocorre de maneira exaustivamente repetitiva durante a função principal; tal-
+-vez houvesse uma forma menos redundante de se fazer isso, mas tive dificuldade em contornar
+esse problema, por isso optei por manter os diversos laços similares.
  */
 
 /* PROTÓTIPO DAS FUNÇÕES */
