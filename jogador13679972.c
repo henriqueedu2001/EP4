@@ -55,7 +55,7 @@ int pontos_linha13679972(int n, int qtd_a, int qtd_b);
 /* devolve uma jogada feita pela máquina */
 int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col){
   int i, j, k;
-  int maior_pont = 0;
+  int maior_pont = -1;
   int atual_pont = 0;
   int x_otimo = 0;
   int y_otimo = 0;
