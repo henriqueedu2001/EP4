@@ -12,8 +12,10 @@ int altura(int ***tab, int n, int x, int y);
 
 void receber_jogadas(int ***tab, int n, int cor);
 int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
+int fim_de_jogo(int ***tab, int n);
 int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
 int pontos_linha(int n, int qtd_a, int qtd_b);
+
 
 
 int main() {
@@ -34,47 +36,52 @@ int main() {
 void receber_jogadas(int ***tab, int n, int cor) {
   int x, y, z;
   char acao;
+  int vencedor;
 
   printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
   scanf(" %c", &acao);
-  printf("Para jogar, digite dois inteiro x e y\n");
 
   if(acao == 'a'){
+    print_tab(tab, n);
+    printf("Para jogar, digite dois inteiro x e y\n");
     scanf(" %d %d", &x, &y);
     z = altura(tab, n, x, y);
     insere(tab, n, cor, x, y);
   }
   print_tab(tab, n);
-  while (ACABOU == 0) {
+  while (1) {
     /* jogada da máquina */
     escolheJogada(tab, n, -cor, &x, &y);
     insere(tab, n, -cor, x, y);
-    if(ACABOU == 1){
-      printf("Você perdeu!");
-    } else {
-      print_tab(tab, n);
+    print_tab(tab, n);
+
+    vencedor = fim_de_jogo(tab, n);
+    if(vencedor == 1){
+      printf("Voce ganhou!");
+      break;
+    } else if(vencedor == -1){
+      printf("Voce perdeu.");
+      break;
     }
     
     /* jogada humana */
     scanf(" %d %d", &x, &y);
-    /* término do jogo */
-    if (x == -1 || y == -1)
-      break;
     if (!disponivel(tab, n, x, y))
       printf("Posição não disponível\n");
     else{
       z = altura(tab, n, x, y);
       insere(tab, n, cor, x, y);
-    }
-
-    if(ACABOU == 1){
-      printf("Você venceu!");
-    } else {
       print_tab(tab, n);
     }
-    
 
-    
+    vencedor = fim_de_jogo(tab, n);
+    if(vencedor == 1){
+      printf("Voce ganhou!");
+      break;
+    } else if(vencedor == -1){
+      printf("Voce perdeu.");
+      break;
+    }
   }
 }
 
@@ -108,12 +115,96 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   return 0;
 }
 
+/* diz se o jogo está ou não finalizado e retorna o índice do jogador campeão */
+int fim_de_jogo(int ***tab, int n){
+  int qtd_cor_a;
+  int qtd_cor_b;
+  int i, j, k;
+
+  /* BUSCA PELAS LINHAS CLASSE 1 */
+
+  /* busca pela linha em paralela ao eixo x */
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      qtd_cor_a = 0;
+      qtd_cor_b = 0;
+      for(k = 0; k < n; k++){
+        if(tab[k][i][j] == 1){
+          qtd_cor_a++;
+        } else if(tab[k][j][i] == -1){
+          qtd_cor_b++;
+        }
+        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+          break;
+        }
+      }
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha em paralela ao eixo y */
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      qtd_cor_a = 0;
+      qtd_cor_b = 0;
+      for(k = 0; k < n; k++){
+        if(tab[i][k][j] == 1){
+          qtd_cor_a++;
+        } else if(tab[i][k][i] == -1){
+          qtd_cor_b++;
+        }
+        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+          break;
+        }
+      }
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+  
+  /* busca pela linha em paralela ao eixo z */
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      qtd_cor_a = 0;
+      qtd_cor_b = 0;
+      for(k = 0; k < n; k++){
+        if(tab[i][j][k] == 1){
+          qtd_cor_a++;
+        } else if(tab[i][j][k] == -1){
+          qtd_cor_b++;
+        }
+        if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+          break;
+        }
+      }
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  return 0;
+}
+
 /* para uma posição (x,y,z), retorna a pontuação correspondente */
 int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   int pontos = 0;
   int i, j, k;
   int qtd_cor_a = 0;
   int qtd_cor_b = 0;
+
+  if(z == n - 1){
+    return -1;
+  }
 
   /* BUSCA PELAS LINHAS CLASSE 1 */
   /* busca pela linha em paralela ao eixo x */
