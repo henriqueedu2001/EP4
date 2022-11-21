@@ -47,7 +47,6 @@ esse problema, por isso optei por manter os diversos laços similares.
 /* PROTÓTIPO DAS FUNÇÕES */
 
 void insere13679972(int ***tab, int n, int cor, int x, int y);
-int disponivel13679972(int ***tab, int n, int x, int y);
 int altura13679972(int ***tab, int n, int x, int y);
 int escolheJogada13679972(int *** tab, int n, int cor, int *lin, int *col);
 int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z);
@@ -371,14 +370,6 @@ int pontos_linha13679972(int n, int qtd_a, int qtd_b){
     return 1;
   }
   return 0;
-}
-
-/* verifica se a posição (x,y) não está cheia*/
-int disponivel(int ***tab, int n, int x, int y) {
-  /* verifica se a posição (x,y) da última camada está vazia */
-  if (tab[x][y][n - 1] != 0)
-    return 0;
-  return 1;
 }
 
 /* retorna a altura da pilha na posição (x,y) */
