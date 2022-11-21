@@ -1,6 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* DOCUMENTAÇÃO */
+
+/* ALGORITMO */
+/* Inicialmente, pensei em implantar um minimax. No entanto, percebi que sua complexidade é 
+simplesmente catastrófica; para escolher a primeira jogada, ele precisa simular todas as
+possíveis jogadas para cada uma das n^2 posições. Após certa pesquisa, vi que era um resul-
+-tado relativamente conhecido de teoria dos jogos que a estratégia de obstruir a maior quan-
+-tidade de vias possíveis enquanto busca a maior quantidade de alinhamentos favoráveis é a
+melhor técnica para o jogo da velha n x n. Eu conjecturo que esta seja a melhor técnica pa-
+-ra no n x n x n 3D e baseio minha estratégia nela.
+  Assim, temos o seguinte algoritmo:
+    (i) para cada posição (x,y), calcular uma pontuação
+    (ii) a pontuação é calculada a partir da quantidade de linhas retas que aquela jogada é
+    capaz de bloquear ou preencher.
+    (iii) escolher a posição com a maior pontuação.
+  A pontuação segue aos seguintes critérios: para cada linha que será obstruída, ou seja,
+  inutilizada para o adversário, acrescentar uma unidade à pontuação. Para cada linha pres-
+  -tes a ser preenchida pelo adversário, contar uma quantidade de pontos tal que essa quan-
+  -tia seja maior que a maior quantidade de linhas potencialemente obstruídas por uma única
+  casa, pois é mais importante impedir uma vitória que ocupar uma posição numa fila vazia. 
+  Neste caso, a pontuação escolhida foi 50, apenas por segurança, mas poderia ser menor. Se
+  há uma fila quase preenchida favoravelmente, a mesma ideia se aplica, para que a máquina
+  priorize vencer ao invés de marcar uma outra posição. Por fim, a pontuação não soma nada
+  se uma fila já estiver obstruída, pois posicioná-la neste lugar não traz benefício algum.
+Referência: Positional Games by Hefetz, Krivelevich, Stojaković and Szabó */
+
+/*  */
+
 int ACABOU = 0;
 
 void print_tab(int ***tab, int n);
@@ -34,7 +62,9 @@ int main() {
 void receber_jogadas(int ***tab, int n, int cor) {
   int x, y, z;
   char acao;
-  int vencedor;
+  int vencedor = 0;
+  int contador = 0;
+  int max = n*n*n;
 
   printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
   scanf(" %c", &acao);
@@ -47,12 +77,14 @@ void receber_jogadas(int ***tab, int n, int cor) {
     insere(tab, n, cor, x, y);
   }
   print_tab(tab, n);
-  while (1) {
+  while (contador <= max) {
     /* jogada da máquina */
     escolheJogada(tab, n, -cor, &x, &y);
     insere(tab, n, -cor, x, y);
     print_tab(tab, n);
+    contador++;
 
+    /* verificação de vencedor */
     vencedor = fim_de_jogo(tab, n);
     if(vencedor == 1){
       printf("Voce ganhou!");
@@ -70,8 +102,10 @@ void receber_jogadas(int ***tab, int n, int cor) {
       z = altura(tab, n, x, y);
       insere(tab, n, cor, x, y);
       print_tab(tab, n);
+      contador++;
     }
 
+    /* verificação de vencedor */
     vencedor = fim_de_jogo(tab, n);
     if(vencedor == 1){
       printf("Voce ganhou!");
@@ -80,6 +114,9 @@ void receber_jogadas(int ***tab, int n, int cor) {
       printf("Voce perdeu.");
       break;
     }
+  if(contador == max && vencedor == 0){
+    printf("Empate.\n");
+  }
   }
 }
 
@@ -92,7 +129,7 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
   int y_otimo = 0;
 
   printf("Maquina pensando na jogada...\n");
-
+  printf("Mapa tático:\n");
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){
       k = altura(tab, n, i, j);
@@ -109,6 +146,11 @@ int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
 
   *lin = x_otimo;
   *col = y_otimo;
+
+  /* caso não exista nenhuma posição disponível */
+  if(maior_pont == -1){
+    return -1;
+  }
 
   return 0;
 }
@@ -198,6 +240,116 @@ int fim_de_jogo(int ***tab, int n){
       if(tab[i][n-j-1][j] == 1){
         qtd_cor_a++;
       } else if(tab[i][n-j-1][j] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha do plano com os pontos C, D, E e F */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[i][j][j] == 1){
+        qtd_cor_a++;
+      } else if(tab[i][j][j] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha do plano com os pontos A, D, F e G */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[j][i][j] == 1){
+        qtd_cor_a++;
+      } else if(tab[j][i][j] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha do plano com os pontos B, C, E e H */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[n-j-1][i][j] == 1){
+        qtd_cor_a++;
+      } else if(tab[n-j-1][i][j] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha do plano com os pontos A, C, G e E */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[n-j-1][j][i] == 1){
+        qtd_cor_a++;
+      } else if(tab[n-j-1][j][i] == -1){
+        qtd_cor_b++;
+      }
+      if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
+        break;
+      }
+
+      if(qtd_cor_a == n){
+        return 1;
+      } else if(qtd_cor_b == n){
+        return -1;
+      }
+    }
+  }
+
+  /* busca pela linha do plano com os pontos B, D, F e H */
+  for(i = 0; i < n; i++){
+    qtd_cor_a = 0;
+    qtd_cor_b = 0;
+    for(j = 0; j < n; j++){
+      if(tab[j][j][i] == 1){
+        qtd_cor_a++;
+      } else if(tab[j][j][i] == -1){
         qtd_cor_b++;
       }
       if(qtd_cor_a >= 1 && qtd_cor_b >= 1){
