@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void receber_jogadas(int ***tab, int n, int cor);
-void jogar_ia();
+int ACABOU = 0;
+
 void print_tab(int ***tab, int n);
 void print_cam(int ***tab, int n, int camada);
 void insere(int ***tab, int n, int cor, int x, int y);
@@ -10,9 +10,11 @@ int disponivel(int ***tab, int n, int x, int y);
 int ***cria_tab(int n);
 int altura(int ***tab, int n, int x, int y);
 
+void receber_jogadas(int ***tab, int n, int cor);
+int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
 int pontuacao(int ***tab, int n, int cor, int x, int y, int z);
 int pontos_linha(int n, int qtd_a, int qtd_b);
-int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
+
 
 int main() {
   int n;
@@ -25,6 +27,84 @@ int main() {
   printf("Tabuleiro criado!\n");
 
   receber_jogadas(tab, n, 1);
+  return 0;
+}
+
+/* recebe entradas dos jogadores */
+void receber_jogadas(int ***tab, int n, int cor) {
+  int x, y, z;
+  char acao;
+
+  printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
+  scanf(" %c", &acao);
+  printf("Para jogar, digite dois inteiro x e y\n");
+
+  if(acao == 'a'){
+    scanf(" %d %d", &x, &y);
+    z = altura(tab, n, x, y);
+    insere(tab, n, cor, x, y);
+  }
+  print_tab(tab, n);
+  while (ACABOU == 0) {
+    /* jogada da máquina */
+    escolheJogada(tab, n, -cor, &x, &y);
+    insere(tab, n, -cor, x, y);
+    if(ACABOU == 1){
+      printf("Você perdeu!");
+    } else {
+      print_tab(tab, n);
+    }
+    
+    /* jogada humana */
+    scanf(" %d %d", &x, &y);
+    /* término do jogo */
+    if (x == -1 || y == -1)
+      break;
+    if (!disponivel(tab, n, x, y))
+      printf("Posição não disponível\n");
+    else{
+      z = altura(tab, n, x, y);
+      insere(tab, n, cor, x, y);
+    }
+
+    if(ACABOU == 1){
+      printf("Você venceu!");
+    } else {
+      print_tab(tab, n);
+    }
+    
+
+    
+  }
+}
+
+/* devolve uma jogada feita pela máquina */
+int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
+  int i, j, k;
+  int maior_pont = 0;
+  int atual_pont = 0;
+  int x_otimo = 0;
+  int y_otimo = 0;
+
+  printf("Maquina pensando na jogada...\n");
+
+  for(i = 0; i < n; i++){
+    for(j = 0; j < n; j++){
+      k = altura(tab, n, i, j);
+      atual_pont = pontuacao(tab, n, cor, i, j, k);
+      if(atual_pont > maior_pont){
+        maior_pont = atual_pont;
+        x_otimo = i;
+        y_otimo = j;
+      }
+      printf("%d ", pontuacao(tab, n, cor, i, j, k));
+    }
+    printf("\n");
+  }
+
+  *lin = x_otimo;
+  *col = y_otimo;
+
   return 0;
 }
 
@@ -171,8 +251,7 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
     pontos += pontos_linha(n, qtd_cor_a, qtd_cor_b);
   }
 
-  /* BUSCA PELAS LINHAS CLASSE 3 */
-  /* busca na diagonal AG */
+  /* busca pela linha do plano com os pontos A, C, G, e E */
   qtd_cor_a = 0;
   qtd_cor_b = 0;
   if(x){
@@ -195,7 +274,12 @@ int pontuacao(int ***tab, int n, int cor, int x, int y, int z){
   return pontos;
 }
 
+/* retorna a pontuação correspondente de uma certa linha */
 int pontos_linha(int n, int qtd_a, int qtd_b){
+  if(qtd_a == n || qtd_b == n){
+    ACABOU = 1;
+    return 0;
+  }
   if(qtd_a >= 1 && qtd_b == 0){
     /* caso de linha apenas da cor desejada */
     if(qtd_a == n - 1)
@@ -210,72 +294,6 @@ int pontos_linha(int n, int qtd_a, int qtd_b){
     /* caso de linha vazia */
     return 1;
   }
-  return 0;
-}
-
-void receber_jogadas(int ***tab, int n, int cor) {
-  int x, y, z;
-  char acao;
-
-  printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
-  scanf(" %c", &acao);
-  printf("Para jogar, digite dois inteiro x e y\n");
-
-  if(acao == 'a'){
-    scanf(" %d %d", &x, &y);
-    z = altura(tab, n, x, y);
-    insere(tab, n, cor, x, y);
-  }
-  print_tab(tab, n);
-  while (1) {
-    /* jogada da máquina */
-    escolheJogada(tab, n, -cor, &x, &y);
-    insere(tab, n, -cor, x, y);
-    print_tab(tab, n);
-    
-    /* jogada humana */
-    scanf(" %d %d", &x, &y);
-    /* término do jogo */
-    if (x == -1 || y == -1)
-      break;
-    if (!disponivel(tab, n, x, y))
-      printf("Posição não disponível\n");
-    else{
-      z = altura(tab, n, x, y);
-      insere(tab, n, cor, x, y);
-    }
-    print_tab(tab, n);
-
-    
-  }
-}
-
-int escolheJogada(int *** tab, int n, int cor, int *lin, int *col){
-  int i, j, k;
-  int maior_pont = 0;
-  int atual_pont = 0;
-  int x_otimo = 0;
-  int y_otimo = 0;
-
-  printf("Maquina pensando na jogada...\n");
-
-  for(i = 0; i < n; i++){
-    for(j = 0; j < n; j++){
-      k = altura(tab, n, i, j);
-      atual_pont = pontuacao(tab, n, cor, i, j, k);
-      if(atual_pont > maior_pont){
-        maior_pont = atual_pont;
-        x_otimo = i;
-        y_otimo = j;
-      }
-      printf("%d ", pontuacao(tab, n, cor, i, j, k));
-    }
-    printf("\n");
-  }
-
-  *lin = x_otimo;
-  *col = y_otimo;
-
   return 0;
 }
 
