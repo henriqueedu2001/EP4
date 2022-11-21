@@ -16,18 +16,31 @@ melhor técnica para o jogo da velha n x n. Eu conjecturo que esta seja a melhor
     (ii) a pontuação é calculada a partir da quantidade de linhas retas que aquela jogada é
     capaz de bloquear ou preencher.
     (iii) escolher a posição com a maior pontuação.
-  A pontuação segue aos seguintes critérios: para cada linha que será obstruída, ou seja,
-  inutilizada para o adversário, acrescentar uma unidade à pontuação. Para cada linha pres-
-  -tes a ser preenchida pelo adversário, contar uma quantidade de pontos tal que essa quan-
-  -tia seja maior que a maior quantidade de linhas potencialemente obstruídas por uma única
-  casa, pois é mais importante impedir uma vitória que ocupar uma posição numa fila vazia. 
-  Neste caso, a pontuação escolhida foi 50, apenas por segurança, mas poderia ser menor. Se
-  há uma fila quase preenchida favoravelmente, a mesma ideia se aplica, para que a máquina
-  priorize vencer ao invés de marcar uma outra posição. Por fim, a pontuação não soma nada
-  se uma fila já estiver obstruída, pois posicioná-la neste lugar não traz benefício algum.
+  A pontuação segue aos seguintes critérios: para cada linha que será obstruída, ou seja, 
+inutilizada para o adversário, acrescentar uma unidade à pontuação. Para cada linha prestes
+a ser preenchida pelo adversário, contar uma quantidade de pontos tal que essa quantia seja 
+maior que a maior quantidade de linhas potencialemente obstruídas por uma única casa, pois é
+mais importante impedir uma vitória que ocupar uma posição numa fila vazia. Neste caso, a 
+pontuação escolhida foi 50, apenas por segurança, mas poderia ser menor. Se há uma fila qua-
+-se preenchida favoravelmente, a mesma ideia se aplica, para que a máquina priorize vencer 
+ao invés de marcar uma outra posição. Por fim, a pontuação não soma nada se uma fila já es-
+tiver obstruída, pois posicioná-la neste lugar não traz benefício algum.
+  Essa estratégia torna a implementação do EP pobre em questão de estrutura de dados e algo-
+-ritmos, pois sua realização é tão simples, do ponto de vista conceitual, que não necessita
+de estruturas como árvores, listas ligadas, pilhas etc. Se o objetivo maior não fosse produ-
+zir a função mais eficaz, mas abordar os temas tratados no curso, faria diferente; no entan-
+-to, meu desejo é mais ganhar o campeonato que brincar com árvores.
 Referência: Positional Games by Hefetz, Krivelevich, Stojaković and Szabó */
 
-/*  */
+/* CÓDIGO */
+/* O coração do código é a função que escolhe jogadas; sua implementação é bem direta: para
+uma certa posição (x,y,z), ela investiga o padrão de cada linha reta que passa por ela, como
+as retas paralelas a Ox, Oy e Oz (retas classe 1), as paralelas a planos definidos por ares-
+-tas do cubo (retas classe 2) e, finalmente, as diagonais de vértices opostos do cubo (retas
+classe 3) — estou denominando de classes para separá-las em categorias.
+ */
+
+/* PROTÓTIPO DAS FUNÇÕES */
 
 void print_tab(int ***tab, int n);
 void print_cam(int ***tab, int n, int camada);
@@ -35,7 +48,6 @@ void insere(int ***tab, int n, int cor, int x, int y);
 int disponivel13679972(int ***tab, int n, int x, int y);
 int ***cria_tab(int n);
 int altura13679972(int ***tab, int n, int x, int y);
-
 void receber_jogadas(int ***tab, int n, int cor);
 int escolheJogada(int *** tab, int n, int cor, int *lin, int *col);
 int fim_de_jogo(int ***tab, int n);
@@ -62,7 +74,10 @@ void receber_jogadas(int ***tab, int n, int cor) {
   char acao;
   int vencedor = 0;
   int contador = 0;
-  int max = n*n*n;
+  int max;
+
+  x = y = z = 0;
+  max = n*n*n;
 
   printf("Desejas jogar primeiro?\n[a] Sim\n[b] Nao\n");
   scanf(" %c", &acao);
@@ -159,7 +174,6 @@ int fim_de_jogo(int ***tab, int n){
   int qtd_cor_b;
   int i, j, k;
 
-  return 0;
   /* BUSCA PELAS LINHAS CLASSE 1 */
 
   /* busca pela linha em paralela ao eixo x */
@@ -372,6 +386,9 @@ int pontuacao13679972(int ***tab, int n, int cor, int x, int y, int z){
   int i, j, k;
   int qtd_cor_a = 0;
   int qtd_cor_b = 0;
+
+  qtd_cor_a = qtd_cor_b = 0;
+  i = j = k = 0;
 
   if(z == n){
     return -1;
@@ -671,7 +688,14 @@ void print_cam(int ***tab, int n, int camada) {
     /* impressão linha a linha */
     for (j = 0; j < n; j++) {
       /* impressão de cada elemento de cada coluna */
-      printf("%d ", tab[i][j][camada]);
+      if(tab[i][j][camada] == 1){
+        printf(" 1 ");
+      } else if(tab[i][j][camada] == -1){
+        printf("-1 ");
+      } else {
+        printf(" 0 ");
+      }
+      
     }
     printf("\n");
   }
